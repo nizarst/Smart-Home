@@ -1,0 +1,9 @@
+{
+  "hosting": [
+    {
+      "target": "smart_home_web",
+      "source": ".",
+      "frameworksBackend": {}
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "smart-home-5107f": {
+      "hosting": {
+        "smart_home_web": [
+          "smart-home-5107f"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "smart-home-5107f"
+  }
+}
