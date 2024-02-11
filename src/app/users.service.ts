@@ -9,7 +9,7 @@ export class UsersService {
   constructor(private db: Database) { }
 
   getUsers() {
-    const usersRef = ref(this.db, 'users/');
+    const usersRef = ref(this.db, 'attendance/');
     return listVal(usersRef);
   }
 }

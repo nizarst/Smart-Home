@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { UsersService } from '../users.service';
+import { UsersService } from '../users.service'; // Adjust the path as necessary
 
 @Component({
   selector: 'app-users-list',
@@ -7,14 +7,14 @@ import { UsersService } from '../users.service';
   styleUrls: ['./users-list.component.css']
 })
 export class UsersListComponent implements OnInit {
-  // Initialize users as an empty array
-  users: any[] = [];
+  // Define the attendance property to store your data
+  attendance: any[] = [];
 
   constructor(private usersService: UsersService) { }
 
   ngOnInit() {
     this.usersService.getUsers().subscribe(data => {
-      this.users = data;
+      this.attendance = data;
     });
   }
 }

@@ -6,9 +6,16 @@
           "smart-home-5107f"
         ]
       }
+    },
+    "iote-d00e4": {
+      "hosting": {
+        "smart_home_web": [
+          "iote-d00e4"
+        ]
+      }
     }
   },
   "projects": {
-    "default": "smart-home-5107f"
+    "default": "iote-d00e4"
   }
 }
