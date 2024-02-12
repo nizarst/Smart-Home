@@ -76,7 +76,11 @@ void setup() {
 
 void loop() {
   if (Firebase.ready()) {
+    lcd.clear();
+    lcd.setCursor(2,0);
+    lcd.print("SCANNER CARTE");
     if (mfrc522.PICC_IsNewCardPresent() && mfrc522.PICC_ReadCardSerial()) {
+      
       processRFIDCard();
     }
   }
@@ -88,6 +92,7 @@ void processRFIDCard() {
   String userName = "Unkown";
   String userPath = "/users/" + uid;
   String attendancePath = "/attendance/" + uid;
+ 
   fbdo.clear();
 
   // Obtenir la date actuelle pour créer ou vérifier un enregistrement unique par jour
@@ -98,6 +103,15 @@ void processRFIDCard() {
   strftime(dateStamp, sizeof(dateStamp), "%Y-%m-%d", &timeinfo);
 
   //String attendancePath = attendancePath + "/" + String(dateStamp);
+  if (uid){
+      lcd.clear();
+      delay(500);
+      lcd.setCursor(3,0);
+      lcd.print("ID RECUPEREE");
+      lcd.setCursor(5,1);
+      lcd.print("......");
+      delay(1000);
+    }
 
   if (!Firebase.RTDB.get(&fbdo, userPath)) {
     // Si l'utilisateur n'existe pas, créez-le
@@ -106,36 +120,37 @@ void processRFIDCard() {
     Firebase.RTDB.setString(&fbdo, userPath + "/name", userName);
     Serial.println("--------after set string-------");
     lcdDisplay("New: " + userName);
-    
   }
+  else
+  {
+    // Vérifier si l'utilisateur a déjà un enregistrement pour aujourd'hui
+    if (!Firebase.RTDB.get(&fbdo, attendancePath)) {
 
-  // Vérifier si l'utilisateur a déjà un enregistrement pour aujourd'hui
-  if (!Firebase.RTDB.get(&fbdo, attendancePath)) {
-
-    if (Firebase.RTDB.get(&fbdo, userPath + "/name")) {
-      if (fbdo.dataType() == "string") {
-        userName = fbdo.stringData();
-        Serial.println("User Name: " + userName);
-        Serial.println("--------after set username-------");
+      if (Firebase.RTDB.get(&fbdo, userPath + "/name")) {
+        if (fbdo.dataType() == "string") {
+          userName = fbdo.stringData();
+          Serial.println("User Name: " + userName);
+          Serial.println("--------after set username-------");
+        }
       }
-    }
 
-    // Première scan de la journée, enregistrer time in
-    char timeStamp[20];
-    strftime(timeStamp, sizeof(timeStamp), "%H:%M:%S", &timeinfo);
-    Firebase.RTDB.setString(&fbdo, attendancePath + "/time_in", timeStamp);
-    Firebase.RTDB.setString(&fbdo, attendancePath + "/name", userName);
-    lcdDisplay("Arrival: " + String(timeStamp));
-  } else {
-    // Si time_in est présent mais pas time_out, enregistrer time_out
-    if (!Firebase.RTDB.get(&fbdo, attendancePath + "/time_out")) {
+      // Première scan de la journée, enregistrer time in
       char timeStamp[20];
       strftime(timeStamp, sizeof(timeStamp), "%H:%M:%S", &timeinfo);
-      Firebase.RTDB.setString(&fbdo, attendancePath + "/time_out", timeStamp);
-      lcdDisplay("Departure: " + String(timeStamp));
+      Firebase.RTDB.setString(&fbdo, attendancePath + "/time_in", timeStamp);
+      Firebase.RTDB.setString(&fbdo, attendancePath + "/name", userName);
+      lcdDisplay("ENT: " + String(timeStamp));
     } else {
-      // Refuser le troisième scan
-      lcdDisplay("Already Logged In & Out");
+      // Si time_in est présent mais pas time_out, enregistrer time_out
+      if (!Firebase.RTDB.get(&fbdo, attendancePath + "/time_out")) {
+        char timeStamp[20];
+        strftime(timeStamp, sizeof(timeStamp), "%H:%M:%S", &timeinfo);
+        Firebase.RTDB.setString(&fbdo, attendancePath + "/time_out", timeStamp);
+        lcdDisplay("SOT: " + String(timeStamp));
+      } else {
+        // Refuser le troisième scan
+        lcdDisplay("SORTIE BADGEE");
+      }
     }
   }
 }
