@@ -34,6 +34,10 @@ const long sendDataIntervalMillis = 10000; //--> Sends/stores data to firebase d
 MFRC522 mfrc522(SS_PIN, RST_PIN);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
+const char* ntpServer = "pool.ntp.org";
+const long  gmtOffset_sec = 3600;  // Ajustez selon votre fuseau horaire, en secondes
+const int   daylightOffset_sec = 3600;  // Ajustez pour l'heure d'été si nécessaire
+
 void setup() {
   Serial.begin(115200);
   SPI.begin();
@@ -72,6 +76,9 @@ void setup() {
   
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
+
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
 }
 
 void loop() {
@@ -133,7 +140,7 @@ void processRFIDCard() {
           Serial.println("--------after set username-------");
         }
       }
-
+      
       // Première scan de la journée, enregistrer time in
       char timeStamp[20];
       strftime(timeStamp, sizeof(timeStamp), "%H:%M:%S", &timeinfo);
